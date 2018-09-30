@@ -12,9 +12,9 @@ def get_manga_page(url):
     res.raise_for_status()
     manga_site = bs4.BeautifulSoup(res.text, features="html.parser")
 
-    manga_link_sources = manga_site.select('.itemThumb ')
+    manga_links_sources = manga_site.select('.itemThumb ')
     manga_links = []
-    for manga in manga_link_sources:
+    for manga in manga_links_sources:
         manga_links.append('https://www.ebookjapan.jp' + manga.get('href'))
 
     # 次へボタンのURLを更新する
@@ -30,19 +30,17 @@ def get_manga_date(url):
     res.raise_for_status()
     manga_site = bs4.BeautifulSoup(res.text, features="html.parser")
 
-    manga_data = []
     volume_title = manga_site.select('#volumeTitle')
     book_detail_text = manga_site.select('#bookDetailText')
     book_author = manga_site.select('.bookAuthor')
     book_publisher = manga_site.select('.bookPublisher')
-    # print(volume_title[0].getText())
-    # print(book_detail_text[0].getText())
-    # print(book_author[0].getText())
-    # print(book_publisher[0].getText())
+
+    manga_data = []
     manga_data.append(volume_title[0].getText())
     manga_data.append(book_detail_text[0].getText())
     manga_data.append(book_author[0].getText())
     manga_data.append(book_publisher[0].getText())
+
     return manga_data
 
 
