@@ -3,6 +3,7 @@
 
 import requests
 import bs4
+import openpyxl
 
 
 # 一覧ページから漫画のページを取得する
@@ -31,15 +32,15 @@ def get_manga_date(url):
     manga_site = bs4.BeautifulSoup(res.text, features="html.parser")
 
     volume_title = manga_site.select('#volumeTitle')
-    book_detail_text = manga_site.select('#bookDetailText')
     book_author = manga_site.select('.bookAuthor')
     book_publisher = manga_site.select('.bookPublisher')
+    book_detail_text = manga_site.select('#bookDetailText')
 
     manga_data = []
     manga_data.append(volume_title[0].getText())
-    manga_data.append(book_detail_text[0].getText())
     manga_data.append(book_author[0].getText())
     manga_data.append(book_publisher[0].getText())
+    manga_data.append(book_detail_text[0].getText())
 
     return manga_data
 
@@ -50,14 +51,24 @@ pager_next = 'https://www.ebookjapan.jp/ebj/search_book/page1/?q=&search_type=bo
 manga_data_list = []
 
 # とりあえず3回繰り返す
-for i in range(3):
+for i in range(1):
     manga_link_url_list = get_manga_page(pager_next)
     for manga_link_url in manga_link_url_list:
         manga_data_list.append(get_manga_date(manga_link_url))
 
 # data.txtに漫画のデータを書き込む
-data_file = open('data.txt', 'w')
-for manga in manga_data_list:
-    for m in manga:
-        data_file.write(m + '\n')
-data_file.close()
+# data_file = open('data.txt', 'w')
+# for manga in manga_data_list:
+#     for m in manga:
+#         data_file.write(m + '\n')
+# data_file.close()
+
+# エクセルに書き込む用
+wb = openpyxl.load_workbook('data.xlsx')
+sheet = wb['Sheet1']
+
+for r in range(len(manga_data_list)):
+    for c in range(len(manga_data_list[r])):
+        cell = sheet.cell(row=r + 1, column=c + 1, value=manga_data_list[r][c])
+
+wb.save('data.xlsx')
